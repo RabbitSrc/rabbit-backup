@@ -12,11 +12,11 @@ from dateutil.tz import tzlocal
 log = logging.getLogger(__name__)
 
 def get_dropbox_access_token(set_key_if_not_exists=True):
-    config_folder = os.path.join(os.path.expanduser('~'), '.rabbit_dropbox')
+    config_folder = os.path.join(os.path.expanduser('~'), '.rabbit_backup')
     if not os.path.exists(config_folder):
         os.makedirs(config_folder)
 
-    config_file = os.path.join(config_folder, 'config.py')
+    config_file = os.path.join(config_folder, 'dropbox_config.py')
 
     if set_key_if_not_exists and not os.path.isfile(config_file):
         api_key = raw_input('no config file found, please input your google api key:')
