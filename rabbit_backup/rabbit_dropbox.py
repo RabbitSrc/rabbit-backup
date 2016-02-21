@@ -153,6 +153,7 @@ class RabbitDropbox(object):
             print "File path: %s, modified on: %s" % (f['path'], f['modified'])
 
     def clear_bak_files(self, path, days_limit):
+        print 'clearing :%s with retention days: %s '% (path, days_limit)
         metadata = self.dropbox_client.metadata(path)
         for f in metadata['contents']:
             date_modified = parse(f['modified'])

@@ -21,7 +21,7 @@ def main():
     retention_days = args.retention_days
     local_file = args.local_file
 
-    print 'rentention_days: %s ' % retention_days
+    print 'retention_days: %s ' % retention_days
 
     rabbit_dropbox_job = BackupJob(access_token, remote_folder, retention_days)
     rabbit_dropbox_job.backup_and_clear_history_data(local_file)
