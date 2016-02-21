@@ -161,7 +161,7 @@ class RabbitDropbox(object):
                 print 'Deleting file: %s, last modified on: %s' % (f['path'], f['modified'])
                 self.delete_file(f['path'])
             else:
-                print '     > skipping: ' + f['path']
+                print '     > skipping: %s with age %s, last modified on: %s' % (f['path'], file_age, date_modified)
 
         print 'clearing job completed.'
 
