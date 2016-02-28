@@ -12,7 +12,7 @@ def main():
     parser = argparse.ArgumentParser(description='Passing parameter for rabbit youtube....')
 
     parser.add_argument('--remote_folder', '-r', help='remote folder')
-    parser.add_argument('--retention_days', '-d', help='retention days')
+    parser.add_argument('--retention_days', '-d', help='retention days', type=int)
     parser.add_argument('local_file', help='local file', nargs='+')
 
     args = parser.parse_args()
