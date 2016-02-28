@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='rabbit-backup',
-      version='0.0.3',
+      version='0.0.4',
       description='backup local files to dropbox. rabbit_backup_to_dropbox will remove local/remote files after verified based on setting. ',
       author='Guoliang Li',
       author_email='dev@liguoliang.com',
