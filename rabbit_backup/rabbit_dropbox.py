@@ -20,7 +20,7 @@ def get_dropbox_access_token(set_key_if_not_exists=True):
     config_file = os.path.join(config_folder, 'dropbox_config.py')
 
     if set_key_if_not_exists and not os.path.isfile(config_file):
-        api_key = raw_input('no config file found, please input your google api key:')
+        api_key = raw_input('no config file found, please input your dropbox access token:')
         f = open(config_file, 'w+')
         f.write("api_key='%s'\n" % api_key)
         f.close()
