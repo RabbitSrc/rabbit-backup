@@ -3,7 +3,7 @@
 import argparse
 import logging
 
-from rabbit_backup.rabbit_dropbox import RabbitDropbox, get_dropbox_access_token, BackupJob
+from rabbit_backup.rabbit_dropbox import get_dropbox_access_token, BackupJob
 
 
 def main():
@@ -18,7 +18,7 @@ def main():
     args = parser.parse_args()
 
     remote_folder = args.remote_folder
-    retention_days = args.retention_days
+    retention_days = int(args.retention_days)
     local_file = args.local_file
 
     print 'retention_days: %s ' % retention_days

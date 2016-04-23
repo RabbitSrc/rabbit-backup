@@ -11,6 +11,7 @@ from dateutil.tz import tzlocal
 
 log = logging.getLogger(__name__)
 
+
 def get_dropbox_access_token(set_key_if_not_exists=True):
     config_folder = os.path.join(os.path.expanduser('~'), '.rabbit_backup')
     if not os.path.exists(config_folder):
@@ -43,7 +44,7 @@ class BackupJob(object):
     def __init__(self, access_token, backup_remote_path, retention_days):
         self.rabbit_dropbox = RabbitDropbox(access_token)
         self.backup_remote_path = backup_remote_path
-        self.retention_days = retention_days
+        self.retention_days = int(retention_days)
         self.account = self.rabbit_dropbox.get_user_info()
 
     def backup_and_clear_history_data(self, local_file_list):
@@ -56,10 +57,9 @@ class BackupJob(object):
 
 
     def on_upload_verified(self, local_file):
-        print 'Upload job completed, clearing data'
+        log.info('Upload job completed, clearing data')
         remove_local_file(local_file)
-        print 'local file deleted: %s' % local_file
-        print 'clearing remote backup files'
+        log.info('local file deleted: %s' % local_file)
         self.rabbit_dropbox.clear_bak_files(self.backup_remote_path, self.retention_days)
 
     def list_all_files(self):
@@ -80,7 +80,7 @@ class RabbitDropbox(object):
                     on_upload_verified=None):
         local_file = open(local_file_path, 'rb')
         file_size = os.path.getsize(local_file_path)
-        chunk_size = 2 * 1024 * 1024
+        chunk_size = 4 * 1024 * 1024
 
         offset = 0
         upload_id = None
@@ -93,10 +93,10 @@ class RabbitDropbox(object):
 
             offset, upload_id = self.dropbox_client.upload_chunk(StringIO(current_block), chunk_size, offset, upload_id)
             upload_progress = float(offset) / float(file_size)
-            print("Uploaded: %.4f, upload_id: %s, current_block_size: %s" % (upload_progress, upload_id, chunk_size))
+            log.info("Uploaded: %.4f, upload_id: %s, current_block_size: %s" % (upload_progress, upload_id, chunk_size))
             if on_upload_progress is not None:
                 on_upload_progress(upload_progress)
-                print("Uploaded: " + str(upload_progress), ", offset: " + str(offset))
+                log.info("Uploaded: " + str(upload_progress), ", offset: " + str(offset))
             current_block = local_file.read(min(chunk_size, file_size - offset))
 
             if len(current_block) <= 0:
@@ -110,14 +110,14 @@ class RabbitDropbox(object):
         except Exception as e:
             log.error("Exception happened when uploading: %s ",  e.message)
             raise e
-        print "file uploaded: " + remote_path
+        log.info("file uploaded: %s" % remote_path)
 
         if on_upload_completed is not None:
             on_upload_completed("File uploaded")
 
         if self.validate_upload(local_file_path, remote_path):
             if on_upload_verified is not None:
-                print 'Remote file has been verified: no difference found between remote file and local file!'
+                log.info('Remote file has been verified: no difference found between remote file and local file!')
                 on_upload_verified(local_file_path)
         else:
             log.error("Upload task failed! - validation failed!")
@@ -134,7 +134,7 @@ class RabbitDropbox(object):
 
     def get_file(self, local_path, remote_path):
         f, metadata = self.dropbox_client.get_file_and_metadata(remote_path)
-        print 'downloading: %s' % f
+        log.info('downloading: %s' % f)
         chunk_size = 512 * 1024
         with open(local_path, 'wb') as out:
             while True:
@@ -143,14 +143,14 @@ class RabbitDropbox(object):
                     out.write(chunk)
                 else:
                     break
-        print 'file downloaded: %s' % f
+        log.info('file downloaded: %s' % f)
 
     def list_files(self, path):
         metadata = self.dropbox_client.metadata(path)
 
         for f in metadata['contents']:
             # print file['modified']
-            print "File path: %s, modified on: %s" % (f['path'], f['modified'])
+            log.info("File path: %s, modified on: %s" % (f['path'], f['modified']))
 
     def clear_bak_files(self, path, days_limit):
         print 'clearing :%s with retention days: %s '% (path, days_limit)
@@ -158,13 +158,13 @@ class RabbitDropbox(object):
         for f in metadata['contents']:
             date_modified = parse(f['modified'])
             file_age = (datetime.now(tzlocal()) - date_modified).days
-            if days_limit and days_limit > 1 and file_age >= days_limit:
-                print 'Deleting file: %s, last modified on: %s' % (f['path'], f['modified'])
+            if days_limit and 0 < days_limit <= file_age:
+                log.info('Deleting file: %s, last modified on: %s' % (f['path'], f['modified']))
                 self.delete_file(f['path'])
             else:
-                print '     > skipping: %s with age %s, last modified on: %s' % (f['path'], file_age, date_modified)
+                log.info('     > skipping: %s with age %s, last modified on: %s' % (f['path'], file_age, date_modified))
 
-        print 'clearing job completed.'
+        log.info('clearing job completed.')
 
     def delete_file(self, path):
         self.dropbox_client.file_delete(path)
