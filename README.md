@@ -1,5 +1,9 @@
 # rabbit-backup
 
+[![Build Status](https://travis-ci.org/guoliang-dev/rabbit-backup.svg?branch=master)](https://travis-ci.org/guoliang-dev/rabbit-backup)
+[![PyPI version](https://badge.fury.io/py/rabbit-backup.svg)](https://badge.fury.io/py/rabbit-backup)
+[![License](https://img.shields.io/badge/License-Apache%20Software%20License-blue.svg)](https://github.com/guoliang-dev/rabbit-backup/blob/master/LICENSE)
+
 ### main features ###
 
 - upload local file to dropbox
@@ -10,7 +14,4 @@
 http://guoliang-dev.github.io/rabbit-backup/
 
 ### how it works###
-rabbit-backup uses dropbox api to upload local file to dropbox.com; // that's why we need a dropbox access token. 
-
-
-[![Travis](https://img.shields.io/travis/rust-lang/rust.svg?maxAge=2592000)](https://travis-ci.org/guoliang-dev/rabbit-backup)
+rabbit-backup uses dropbox api to upload local file to dropbox.com; // that's why we need a dropbox access token.
