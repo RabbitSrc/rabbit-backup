@@ -1,7 +1,6 @@
 import filecmp
 import imp
 import logging
-
 import os
 from StringIO import StringIO
 from datetime import datetime
@@ -50,11 +49,12 @@ class BackupJob(object):
     def backup_and_clear_history_data(self, local_file_list):
         for local_file in local_file_list:
             if os.path.isfile(local_file):
-                log.info('backing up: %s, to: %s@dropbox_%s' % (local_file, self.backup_remote_path, self.account['email']))
-                self.rabbit_dropbox.upload_file(local_file, self.backup_remote_path, on_upload_verified=self.on_upload_verified)
+                log.info(
+                    'backing up: %s, to: %s@dropbox_%s' % (local_file, self.backup_remote_path, self.account['email']))
+                self.rabbit_dropbox.upload_file(local_file, self.backup_remote_path,
+                                                on_upload_verified=self.on_upload_verified)
             else:
                 log.warn('local file is not existing: %s', local_file)
-
 
     def on_upload_verified(self, local_file):
         log.info('Upload job completed, clearing data')
@@ -108,7 +108,7 @@ class RabbitDropbox(object):
             response = self.dropbox_client.commit_chunked_upload('auto/' + remote_path, upload_id, False)
             remote_path = response['path']
         except Exception as e:
-            log.error("Exception happened when uploading: %s ",  e.message)
+            log.error("Exception happened when uploading: %s ", e.message)
             raise e
         log.info("file uploaded: %s" % remote_path)
 
@@ -153,7 +153,7 @@ class RabbitDropbox(object):
             log.info("File path: %s, modified on: %s" % (f['path'], f['modified']))
 
     def clear_bak_files(self, path, days_limit):
-        print 'clearing :%s with retention days: %s '% (path, days_limit)
+        log.info('clearing :%s with retention days: %s ' % (path, days_limit))
         metadata = self.dropbox_client.metadata(path)
         for f in metadata['contents']:
             date_modified = parse(f['modified'])
